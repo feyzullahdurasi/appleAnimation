@@ -11,6 +11,10 @@
 		65AF96B92C525916001E9CF1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AF96B82C525916001E9CF1 /* ContentView.swift */; };
 		65AF96BB2C525917001E9CF1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 65AF96BA2C525917001E9CF1 /* Assets.xcassets */; };
 		65AF96BE2C525917001E9CF1 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 65AF96BD2C525917001E9CF1 /* Preview Assets.xcassets */; };
+		65AF96C72C526EAC001E9CF1 /* Bracelet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AF96C62C526EAC001E9CF1 /* Bracelet.swift */; };
+		65AF96C92C527130001E9CF1 /* BraceletPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AF96C82C527130001E9CF1 /* BraceletPreview.swift */; };
+		65AF96CB2C5274D4001E9CF1 /* BraceletDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AF96CA2C5274D4001E9CF1 /* BraceletDetailView.swift */; };
+		65AF96CD2C527663001E9CF1 /* CustomTransitionModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AF96CC2C527663001E9CF1 /* CustomTransitionModifier.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +23,10 @@
 		65AF96B82C525916001E9CF1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		65AF96BA2C525917001E9CF1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		65AF96BD2C525917001E9CF1 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		65AF96C62C526EAC001E9CF1 /* Bracelet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bracelet.swift; sourceTree = "<group>"; };
+		65AF96C82C527130001E9CF1 /* BraceletPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraceletPreview.swift; sourceTree = "<group>"; };
+		65AF96CA2C5274D4001E9CF1 /* BraceletDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BraceletDetailView.swift; sourceTree = "<group>"; };
+		65AF96CC2C527663001E9CF1 /* CustomTransitionModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTransitionModifier.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +61,10 @@
 			children = (
 				65AF96B62C525916001E9CF1 /* animationApp.swift */,
 				65AF96B82C525916001E9CF1 /* ContentView.swift */,
+				65AF96C62C526EAC001E9CF1 /* Bracelet.swift */,
+				65AF96C82C527130001E9CF1 /* BraceletPreview.swift */,
+				65AF96CA2C5274D4001E9CF1 /* BraceletDetailView.swift */,
+				65AF96CC2C527663001E9CF1 /* CustomTransitionModifier.swift */,
 				65AF96BA2C525917001E9CF1 /* Assets.xcassets */,
 				65AF96BC2C525917001E9CF1 /* Preview Content */,
 			);
@@ -137,8 +149,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65AF96C92C527130001E9CF1 /* BraceletPreview.swift in Sources */,
+				65AF96CB2C5274D4001E9CF1 /* BraceletDetailView.swift in Sources */,
 				65AF96B92C525916001E9CF1 /* ContentView.swift in Sources */,
+				65AF96CD2C527663001E9CF1 /* CustomTransitionModifier.swift in Sources */,
 				65AF96B72C525916001E9CF1 /* animationApp.swift in Sources */,
+				65AF96C72C526EAC001E9CF1 /* Bracelet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
