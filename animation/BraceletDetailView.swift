@@ -10,8 +10,9 @@ import SwiftUI
 struct BraceletDetailView: View {
     
     @Environment(\.presentationMode) var presentationMode
+    var bracelet: Bracelet
     @State private var balloons: [Balloon] = []
-    @State private var selectedBalloonId: UUID?
+    @State private var selectedBalloons: [Balloon] = []
     @State private var isBoxOpen: Bool = false
     
     let screenWidth = UIScreen.main.bounds.width
@@ -25,138 +26,148 @@ struct BraceletDetailView: View {
                 Text("Geri")
                     .font(.headline)
                     .padding()
-                    
             }
             .padding()
+            Spacer()
             
             ZStack {
                 // Çizim alanı
                 Canvas { context, size in
-                    let path = Path { path in
-                        let width = size.width
-                        let height = size.height
-                        let midY = height / 2
-                        let frequency: CGFloat = -2 * .pi / width
-                        let amplitude: CGFloat = height / 15
-                        
-                        path.move(to: CGPoint(x: 0, y: midY))
-                        
-                        for x in stride(from: 0, to: width, by: 1) {
-                            let y = midY - amplitude * sin(frequency * x)
-                            path.addLine(to: CGPoint(x: x, y: y))
-                        }
-                    }
-                    let strokeColor = Color.purple.opacity(0.5)
+                    let path = createBraceletPath(size: size)
+                    let strokeColor = bracelet.braceletColor.opacity(0.5)
                     context.stroke(path, with: .color(strokeColor), lineWidth: 8)
                 }
                 
-                // Balonlar
-                                ForEach(balloons) { balloon in
-                                    Circle()
-                                        .fill(Color.purple)
-                                        .frame(width: balloon.size, height: balloon.size)
-                                        .overlay(
-                                            Text(balloon.letter)
-                                                .foregroundColor(.white)
-                                                .font(.system(size: balloon.size / 2, weight: .bold))
-                                        )
-                                        .position(x: balloon.x, y: balloon.y)
-                                        .offset(y: selectedBalloonId == balloon.id ? -50 : 0)
-                                        .animation(.easeInOut(duration: 0.5), value: selectedBalloonId)
-                                        .onTapGesture {
-                                            selectBalloon(balloon)
-                                        }
-                                }
-                
-            }
-            .padding()
-            .onAppear {
-                addBalloons()
-            }
-            
-            
-            
-            ZStack {
-                HStack {
-                    ForEach(balloons) { balloon in
-                        
-                        Circle()
-                            .fill(Color.purple)
-                            .frame(width: balloon.size, height: balloon.size)
-                            .overlay(
-                                Text(balloon.letter)
-                                    .foregroundColor(.white)
-                                    .font(.system(size: balloon.size / 2, weight: .bold))
-                            )
-                            .offset(y: selectedBalloonId == balloon.id ? -300 : 0) // Yukarı hareket
-                            .animation(.easeInOut(duration: 1), value: selectedBalloonId)
+                // Seçilmiş balonlar
+                ZStack {
+                    ForEach(selectedBalloons.indices, id: \.self) { index in
+                        let balloon = selectedBalloons[index]
+                        balloonView(for: balloon, index: index)
                             .onTapGesture {
-                                selectBalloon(balloon)
+                                deselectBalloon(balloon)
                             }
                     }
                 }
-                .frame(maxWidth: .infinity, maxHeight: 100)
-                .background(Color.gray.opacity(0.3))
-                .cornerRadius(10)
-                .padding()
-                .padding()
+                .animation(.spring(), value: selectedBalloons)
+            }
+            .frame(height: 300)
+            .padding()
+            
+            Spacer()
+            // Alt kısımdaki balonlar
+            ZStack {
+                HStack(spacing: 10) {
+                                    ForEach(balloons) { balloon in
+                                        balloonView(for: balloon)
+                                            .onTapGesture { selectBalloon(balloon) }
+                                    }
+                                }
+                                .padding()
+                                .frame(maxWidth: .infinity, maxHeight: 100)
+                                .background(Color.gray.opacity(0.3))
+                                .cornerRadius(10)
+                                .padding()
                 
-                BoxWrapper(isOpen: $isBoxOpen)
-                    .frame(maxWidth: .infinity, maxHeight: 100)
-                    .offset(y: isBoxOpen ? -100 : 0)
-                    .rotation3DEffect(
-                        .degrees(isBoxOpen ? -90 : 0),
-                        axis: (x: 1, y: 0, z: 0),
-                        anchor: .bottom
-                    )
-                    .animation(.easeInOut(duration: 0.8), value: isBoxOpen)
-                    .zIndex(1)
-                    .cornerRadius(10)
-                    .padding()
-                    .padding()
-                    
+                boxView
             }
             .onTapGesture {
-                // HStack'e tıklanınca Box'ı yukarı kaldır
                 isBoxOpen.toggle()
             }
             
-            Spacer()
         }
+        .onAppear {
+            addBalloons()
+        }
+    }
+    
+    private func createBraceletPath(size: CGSize) -> Path {
+        Path { path in
+            let width = size.width
+            let height = size.height
+            let midY = height / 2
+            let frequency: CGFloat = -2 * .pi / width
+            let amplitude: CGFloat = height / 12
+            
+            path.move(to: CGPoint(x: 0, y: midY))
+            
+            for x in stride(from: 0, to: width, by: 1) {
+                let y = midY - amplitude * sin(frequency * x)
+                path.addLine(to: CGPoint(x: x, y: y))
+            }
+        }
+    }
+    
+    private func balloonView(for balloon: Balloon, index: Int? = nil) -> some View {
+        let balloonIndex = index ?? balloons.firstIndex(where: { $0.id == balloon.id }) ?? 0
+        let step = screenWidth / CGFloat(balloons.count)
+        let xPosition = CGFloat(balloonIndex) * step
+        let yPosition = yPositionOnPath(x: xPosition)
+        
+        return Circle()
+            .fill(bracelet.braceletColor)
+            .frame(width: balloon.size, height: balloon.size)
+            .overlay(
+                Text(balloon.letter)
+                    .foregroundColor(.white)
+                    .font(.system(size: balloon.size / 2, weight: .bold))
+            )
+            .offset(y: -sin(CGFloat(balloonIndex) * .pi / 5) * 10)
+            .position(x: xPosition, y: yPosition)
+    }
+    
+    private func yPositionOnPath(x: CGFloat) -> CGFloat {
+        let width = screenWidth
+        let height = screenHeight
+        let midY = height / 2
+        let frequency: CGFloat = -2 * .pi / width
+        let amplitude: CGFloat = height / 12
+        
+        return midY - amplitude * sin(frequency * x)
+    }
+    
+    private var boxView: some View {
+        BoxWrapper(isOpen: $isBoxOpen)
+            .frame(maxWidth: .infinity, maxHeight: 100)
+            .offset(y: isBoxOpen ? -100 : 0)
+            .rotation3DEffect(
+                .degrees(isBoxOpen ? -90 : 0),
+                axis: (x: 0, y: 1, z: 0),
+                anchor: .top
+            )
+            .animation(.easeInOut(duration: 0.7), value: isBoxOpen)
+            .cornerRadius(10)
+            .padding()
+            
     }
     
     func addBalloons() {
-        let width = UIScreen.main.bounds.width
-        let height = UIScreen.main.bounds.height
-        let frequency: CGFloat = -2 * .pi / width
-        let amplitude: CGFloat = height / 15
-        
-        // Örnek baloncuklar ekleyelim
-        for i in stride(from: 0, to: width, by: 60) {
-            let y = (height / 5 ) - amplitude * sin(frequency * i)
-            let size: CGFloat = 30
-            let letter = String(UnicodeScalar(Int.random(in: 65...90))!) // A-Z arası rastgele harf
-            balloons.append(Balloon(x: i, y: y, size: size, letter: letter))
-        }
+        balloons = bracelet.word.map { Balloon(size: 30, letter: String($0)) }
+                balloons.shuffle() // Balonları karıştır
     }
     
     func selectBalloon(_ balloon: Balloon) {
-        if selectedBalloonId == balloon.id {
-            // Aynı baloncu seçildiyse hareketi geri al
-            selectedBalloonId = nil
-        } else {
-            // Yeni baloncu seçildiyse yukarı kaldır
-            selectedBalloonId = balloon.id
+        if let index = balloons.firstIndex(where: { $0.id == balloon.id }) {
+            let selectedBalloon = balloons.remove(at: index)
+            selectedBalloons.append(selectedBalloon)
+        }
+    }
+    
+    func deselectBalloon(_ balloon: Balloon) {
+        if let index = selectedBalloons.firstIndex(where: { $0.id == balloon.id }) {
+            let deselectedBalloon = selectedBalloons.remove(at: index)
+            balloons.append(deselectedBalloon)
         }
     }
 }
 
-struct Balloon: Identifiable {
+struct Balloon: Identifiable, Equatable {
     let id = UUID()
-    let x: CGFloat
-    let y: CGFloat
     let size: CGFloat
     let letter: String
+    
+    static func == (lhs: Balloon, rhs: Balloon) -> Bool {
+        lhs.id == rhs.id
+    }
 }
 
 struct BoxWrapper: UIViewRepresentable {
@@ -167,10 +178,10 @@ struct BoxWrapper: UIViewRepresentable {
     }
     
     func updateUIView(_ box: Box, context: Context) {
-            UIView.animate(withDuration: 0.8, animations: {
-                box.lid.transform = self.isOpen ? CGAffineTransform(translationX: 0, y: -50).concatenating(CGAffineTransform(rotationAngle: .pi / 2)) : .identity
-            })
-        }
+        UIView.animate(withDuration: 0.8, animations: {
+            box.lid.transform = self.isOpen ? CGAffineTransform(translationX: 0, y: -50).concatenating(CGAffineTransform(rotationAngle: .pi / 2)) : .identity
+        })
+    }
 }
 
 class Box: UIView {
@@ -201,5 +212,5 @@ class Box: UIView {
 }
 
 #Preview {
-    BraceletDetailView()
+    BraceletDetailView(bracelet: Bracelet(word: "AHMET", braceletColor: Color.green))
 }

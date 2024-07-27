@@ -6,11 +6,12 @@
 //
 
 import Foundation
+import SwiftUI
 
-struct Bracelet: Identifiable {
+struct Bracelet: Identifiable, Equatable {
     var id = UUID()
-    var name: String
-    var description: String
-    var imageName: String
+    let word: String
+    let braceletColor: Color
+
 }
 

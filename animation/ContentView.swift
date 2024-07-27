@@ -13,12 +13,14 @@ struct ContentView: View {
     @State private var isBeadBoxOpen = false
     
     let bracelets: [Bracelet] = [
-        Bracelet(name: "Classic Bracelet", description: "A classic bracelet with elegant design.", imageName: "bracelet1"),
-        Bracelet(name: "Sport Bracelet", description: "A sporty bracelet for active individuals.", imageName: "bracelet2"),
-        Bracelet(name: "Luxury Bracelet", description: "A luxury bracelet with premium materials.", imageName: "bracelet3"),
-        Bracelet(name: "Classic Bracelet", description: "A classic bracelet with elegant design.", imageName: "bracelet1"),
-        Bracelet(name: "Sport Bracelet", description: "A sporty bracelet for active individuals.", imageName: "bracelet2"),
-        Bracelet(name: "Luxury Bracelet", description: "A luxury bracelet with premium materials.", imageName: "bracelet3")
+        Bracelet(word: "FEYZULLAH", braceletColor: Color.indigo),
+        Bracelet(word: "FERDI", braceletColor: Color.blue),
+        Bracelet(word: "ERDI", braceletColor: Color.red),
+        Bracelet(word: "AHMET", braceletColor: Color.green),
+        Bracelet(word: "TAYLAN", braceletColor: Color.orange),
+        Bracelet(word: "MUHAMMED", braceletColor: Color.yellow),
+        Bracelet(word: "YASEMIN", braceletColor: Color.black),
+        Bracelet(word: "HIZIR", braceletColor: Color.brown)
     ]
     
     var body: some View {
@@ -41,7 +43,7 @@ struct ContentView: View {
             }
             .navigationTitle("Bracelets")
             .fullScreenCover(item: $selectedBracelet) { bracelet in
-                BraceletDetailView()
+                BraceletDetailView(bracelet: Bracelet(word: bracelet.word, braceletColor: bracelet.braceletColor))
             }
         }
     }
