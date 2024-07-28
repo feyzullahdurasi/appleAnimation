@@ -12,6 +12,7 @@ struct Bracelet: Identifiable, Equatable {
     var id = UUID()
     let word: String
     let braceletColor: Color
+    let angle: Int
 
 }
 

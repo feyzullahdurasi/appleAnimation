@@ -39,13 +39,14 @@ struct BraceletDetailView: View {
                 }
                 
                 // Seçilmiş balonlar
-                ZStack {
-                    ForEach(selectedBalloons.indices, id: \.self) { index in
-                        let balloon = selectedBalloons[index]
-                        balloonView(for: balloon, index: index)
-                            .onTapGesture {
-                                deselectBalloon(balloon)
-                            }
+                GeometryReader { geometry in
+                    ZStack {
+                        ForEach(selectedBalloons.indices, id: \.self) { index in
+                            balloonView(for: selectedBalloons[index], at: index, in: geometry.size)
+                                .onTapGesture {
+                                    deselectBalloon(selectedBalloons[index])
+                                }
+                        }
                     }
                 }
                 .animation(.spring(), value: selectedBalloons)
@@ -57,16 +58,16 @@ struct BraceletDetailView: View {
             // Alt kısımdaki balonlar
             ZStack {
                 HStack(spacing: 10) {
-                                    ForEach(balloons) { balloon in
-                                        balloonView(for: balloon)
-                                            .onTapGesture { selectBalloon(balloon) }
-                                    }
-                                }
-                                .padding()
-                                .frame(maxWidth: .infinity, maxHeight: 100)
-                                .background(Color.gray.opacity(0.3))
-                                .cornerRadius(10)
-                                .padding()
+                    ForEach(balloons) { balloon in
+                        balloonView2(for: balloon)
+                            .onTapGesture { selectBalloon(balloon) }
+                    }
+                }
+                .padding()
+                .frame(maxWidth: .infinity, maxHeight: 100)
+                .background(Color.gray.opacity(0.3))
+                .cornerRadius(10)
+                .padding()
                 
                 boxView
             }
@@ -85,8 +86,8 @@ struct BraceletDetailView: View {
             let width = size.width
             let height = size.height
             let midY = height / 2
-            let frequency: CGFloat = -2 * .pi / width
-            let amplitude: CGFloat = height / 12
+            let frequency: CGFloat = 2 * .pi / width
+            let amplitude: CGFloat = height / CGFloat(bracelet.angle)
             
             path.move(to: CGPoint(x: 0, y: midY))
             
@@ -97,32 +98,77 @@ struct BraceletDetailView: View {
         }
     }
     
-    private func balloonView(for balloon: Balloon, index: Int? = nil) -> some View {
-        let balloonIndex = index ?? balloons.firstIndex(where: { $0.id == balloon.id }) ?? 0
-        let step = screenWidth / CGFloat(balloons.count)
-        let xPosition = CGFloat(balloonIndex) * step
-        let yPosition = yPositionOnPath(x: xPosition)
+    private func balloonView2(for balloon: Balloon) -> some View {
+            Circle()
+                .fill(bracelet.braceletColor)
+                .frame(width: balloon.size, height: balloon.size)
+                .overlay(
+                    Text(balloon.letter)
+                        .foregroundColor(.white)
+                        .font(.system(size: balloon.size / 2, weight: .bold))
+                )
+                 
+        }
+    private func balloonView(for balloon: Balloon, at index: Int, in size: CGSize) -> some View {
+        let path = createBraceletPath(size: size)
+        let totalWidth = size.width
+        let step: CGFloat
         
-        return Circle()
-            .fill(bracelet.braceletColor)
+        if selectedBalloons.count <= 10 {
+            // 10 balon için eşit aralıklar
+            step = totalWidth / CGFloat(selectedBalloons.count)
+        } else {
+            let remainingBalloons = max(selectedBalloons.count - 5, 1)
+            let firstPartWidth = totalWidth / CGFloat(5)
+            let secondPartWidth = totalWidth / CGFloat(remainingBalloons)
+            
+            // İndeks 0-9 arasındaysa, ilk düzeni kullan
+            if index < 5 {
+                step = firstPartWidth
+            } else {
+                step = secondPartWidth
+            }
+        }
+        
+        let xPosition: CGFloat
+        if selectedBalloons.count <= 5 {
+            // İlk 5 balon için basit eşit aralık
+            xPosition = CGFloat(index) * step
+        } else {
+            // İlk 5 balon sonrasında, kalan balonlar için genişletilmiş aralık
+            if index < 5 {
+                xPosition = CGFloat(index) * step
+            } else {
+                let adjustedIndex = CGFloat(index - 5)
+                xPosition = (CGFloat(5) * step) + (adjustedIndex * step)
+            }
+        }
+        
+        let yPosition = yPositionOnPath(x: xPosition, in: path, size: size)
+        
+        return Text(balloon.letter)
+            .foregroundColor(.white)
+            .font(.system(size: balloon.size / 2, weight: .bold))
             .frame(width: balloon.size, height: balloon.size)
-            .overlay(
-                Text(balloon.letter)
-                    .foregroundColor(.white)
-                    .font(.system(size: balloon.size / 2, weight: .bold))
+            .background(
+                Circle()
+                    .fill(bracelet.braceletColor)
             )
-            .offset(y: -sin(CGFloat(balloonIndex) * .pi / 5) * 10)
             .position(x: xPosition, y: yPosition)
     }
+
     
-    private func yPositionOnPath(x: CGFloat) -> CGFloat {
-        let width = screenWidth
-        let height = screenHeight
+    private func yPositionOnPath(x: CGFloat, in path: Path, size: CGSize) -> CGFloat {
+        // Path'ten Y koordinatını almak için daha hassas bir yöntem
+        let width = size.width
+        let height = size.height
         let midY = height / 2
-        let frequency: CGFloat = -2 * .pi / width
-        let amplitude: CGFloat = height / 12
+        let frequency: CGFloat = 2 * .pi / width
+        let amplitude: CGFloat = height / CGFloat(bracelet.angle)
         
-        return midY - amplitude * sin(frequency * x)
+        // X koordinatına karşılık gelen Y koordinatını hesaplayalım
+        let y = midY - amplitude * sin(frequency * x)
+        return y
     }
     
     private var boxView: some View {
@@ -142,7 +188,7 @@ struct BraceletDetailView: View {
     
     func addBalloons() {
         balloons = bracelet.word.map { Balloon(size: 30, letter: String($0)) }
-                balloons.shuffle() // Balonları karıştır
+        balloons.shuffle() // Balonları karıştır
     }
     
     func selectBalloon(_ balloon: Balloon) {
@@ -212,5 +258,5 @@ class Box: UIView {
 }
 
 #Preview {
-    BraceletDetailView(bracelet: Bracelet(word: "AHMET", braceletColor: Color.green))
+    BraceletDetailView(bracelet: Bracelet(word: "AHMETAHE", braceletColor: Color.green, angle: -12))
 }

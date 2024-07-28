@@ -36,8 +36,8 @@ struct BraceletPreview: View {
             let width = size.width
             let height = size.height
             let midY = height / 2
-            let frequency: CGFloat = -2 * .pi / width
-            let amplitude: CGFloat = height / 8
+            let frequency: CGFloat = 2 * .pi / width
+            let amplitude: CGFloat = height / (CGFloat(bracelet.angle) * 0.6)
             
             path.move(to: CGPoint(x: 0, y: midY))
             
@@ -81,8 +81,8 @@ struct BraceletPreview: View {
         let width = size.width
         let height = size.height
         let midY = height / 2
-        let frequency: CGFloat = -2 * .pi / width
-        let amplitude: CGFloat = height / 8
+        let frequency: CGFloat = 2 * .pi / width
+        let amplitude: CGFloat = height / (CGFloat(bracelet.angle) * 0.6)
         
         // X koordinatına karşılık gelen Y koordinatını hesaplayalım
         let y = midY - amplitude * sin(frequency * x)
@@ -99,5 +99,5 @@ struct BraceletPreview: View {
 
 #Preview {
     @Namespace var namespace
-    return BraceletPreview(bracelet: Bracelet(word: "AHMET", braceletColor: Color.green), namespace: namespace)
+    return BraceletPreview(bracelet: Bracelet(word: "AHMET", braceletColor: Color.green, angle: -12), namespace: namespace)
 }

@@ -13,14 +13,14 @@ struct ContentView: View {
     @State private var isBeadBoxOpen = false
     
     let bracelets: [Bracelet] = [
-        Bracelet(word: "FEYZULLAH", braceletColor: Color.indigo),
-        Bracelet(word: "FERDI", braceletColor: Color.blue),
-        Bracelet(word: "ERDI", braceletColor: Color.red),
-        Bracelet(word: "AHMET", braceletColor: Color.green),
-        Bracelet(word: "TAYLAN", braceletColor: Color.orange),
-        Bracelet(word: "MUHAMMED", braceletColor: Color.yellow),
-        Bracelet(word: "YASEMIN", braceletColor: Color.black),
-        Bracelet(word: "HIZIR", braceletColor: Color.brown)
+        Bracelet(word: "FEYZULLAH", braceletColor: Color.indigo, angle: -6),
+        Bracelet(word: "FERDI", braceletColor: Color.blue, angle: 14),
+        Bracelet(word: "ERDI", braceletColor: Color.red, angle: -10),
+        Bracelet(word: "AHMET", braceletColor: Color.green, angle: -12),
+        Bracelet(word: "TAYLAN", braceletColor: Color.orange, angle: 11),
+        Bracelet(word: "MUHAMMED", braceletColor: Color.yellow, angle: -9),
+        Bracelet(word: "YASEMIN", braceletColor: Color.black, angle: 8),
+        Bracelet(word: "HIZIR", braceletColor: Color.brown, angle: -15)
     ]
     
     var body: some View {
@@ -43,7 +43,7 @@ struct ContentView: View {
             }
             .navigationTitle("Bracelets")
             .fullScreenCover(item: $selectedBracelet) { bracelet in
-                BraceletDetailView(bracelet: Bracelet(word: bracelet.word, braceletColor: bracelet.braceletColor))
+                BraceletDetailView(bracelet: Bracelet(word: bracelet.word, braceletColor: bracelet.braceletColor, angle: bracelet.angle))
             }
         }
     }
