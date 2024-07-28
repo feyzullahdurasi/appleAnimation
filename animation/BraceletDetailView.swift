@@ -32,14 +32,17 @@ struct BraceletDetailView: View {
             
             ZStack {
                 // Çizim alanı
+                // Canvas, özel çizimler yapmak için kullanılır
                 Canvas { context, size in
                     let path = createBraceletPath(size: size)
+                    // Bu verilen boyutlara göre bir yol (Path) oluşturur. Bu yol, üzerinde çizim yapılacak şekli tanımlar.
                     let strokeColor = bracelet.braceletColor.opacity(0.5)
                     context.stroke(path, with: .color(strokeColor), lineWidth: 8)
                 }
                 
                 // Seçilmiş balonlar
                 GeometryReader { geometry in
+                    // geometry parametresi aracılığıyla kapsayıcı görünümün boyut ve konum bilgilerini sağlar. Bu, dinamik olarak boyutları hesaplamak ve kullanmak için kullanılır.
                     ZStack {
                         ForEach(selectedBalloons.indices, id: \.self) { index in
                             balloonView(for: selectedBalloons[index], at: index, in: geometry.size)
@@ -81,15 +84,19 @@ struct BraceletDetailView: View {
         }
     }
     
+    // CGFloat, Swift'te bir kayan nokta sayısı türüdür ve genellikle grafiksel hesaplamalar ve UI tasarımı için kullanılır.
+    
+    // CGPoint, Core Graphics ve SwiftUI'da iki boyutlu bir noktayı temsil eden bir yapıdır. X ve Y koordinatlarını içerir ve genellikle grafiksel işlemlerde, kullanıcı arayüzü düzenlemelerinde veya animasyonlarda kullanılır.
+    
     private func createBraceletPath(size: CGSize) -> Path {
         Path { path in
             let width = size.width
             let height = size.height
             let midY = height / 2
-            let frequency: CGFloat = 2 * .pi / width
-            let amplitude: CGFloat = height / CGFloat(bracelet.angle)
+            let frequency: CGFloat = 2 * .pi / width // Frekansı hesaplar
+            let amplitude: CGFloat = height / CGFloat(bracelet.angle) // Genliği hesaplar
             
-            path.move(to: CGPoint(x: 0, y: midY))
+            path.move(to: CGPoint(x: 0, y: midY)) // (x, y) noktasına bir çizgi çizer. Bu işlem tüm x değerleri için tekrarlanır ve dalga şeklindeki yolu oluşturur.
             
             for x in stride(from: 0, to: width, by: 1) {
                 let y = midY - amplitude * sin(frequency * x)
@@ -99,16 +106,18 @@ struct BraceletDetailView: View {
     }
     
     private func balloonView2(for balloon: Balloon) -> some View {
-            Circle()
-                .fill(bracelet.braceletColor)
-                .frame(width: balloon.size, height: balloon.size)
-                .overlay(
-                    Text(balloon.letter)
-                        .foregroundColor(.white)
-                        .font(.system(size: balloon.size / 2, weight: .bold))
-                )
-                 
-        }
+        Circle()
+            .fill(bracelet.braceletColor)
+            .frame(width: balloon.size, height: balloon.size)
+            .overlay(
+                Text(balloon.letter)
+                    .foregroundColor(.white)
+                    .font(.system(size: balloon.size / 2, weight: .bold))
+            )
+        
+    }
+    
+    // CGSize, iOS ve macOS uygulamalarında genişlik ve yüksekliği temsil eden bir yapıdır.
     private func balloonView(for balloon: Balloon, at index: Int, in size: CGSize) -> some View {
         let path = createBraceletPath(size: size)
         let totalWidth = size.width
@@ -179,8 +188,8 @@ struct BraceletDetailView: View {
                 .degrees(isBoxOpen ? -90 : 0),
                 axis: (x: 0, y: 1, z: 0),
                 anchor: .top
-            )
-            .animation(.easeInOut(duration: 0.7), value: isBoxOpen)
+            ) // rotation3DEffect, 3D dönüşüm uygular. Burada, isBoxOpen true ise kutu -90 derece döner (y ekseninde döner). anchor: .top ifadesi, dönüşümün üstten yapılmasını sağlar.
+            .animation(.easeInOut(duration: 0.7), value: isBoxOpen) // easeInOut animasyon türü, animasyonun yumuşak bir şekilde başlayıp ve bitmesini sağlar.
             .cornerRadius(10)
             .padding()
             
@@ -213,10 +222,11 @@ struct Balloon: Identifiable, Equatable {
     
     static func == (lhs: Balloon, rhs: Balloon) -> Bool {
         lhs.id == rhs.id
-    }
+    } // Bu, iki Balloon örneğini karşılaştırmak için kullanılan parametrelerdir. lhs (left-hand side) ve rhs (right-hand side) terimleri, karşılaştırmanın sol ve sağ tarafındaki nesneleri temsil eder.
 }
 
 struct BoxWrapper: UIViewRepresentable {
+    // UIViewRepresentable, SwiftUI'da UIKit bileşenlerini kullanmanıza olanak tanır.
     @Binding var isOpen: Bool
     
     func makeUIView(context: Context) -> Box {
@@ -225,9 +235,10 @@ struct BoxWrapper: UIViewRepresentable {
     
     func updateUIView(_ box: Box, context: Context) {
         UIView.animate(withDuration: 0.8, animations: {
-            box.lid.transform = self.isOpen ? CGAffineTransform(translationX: 0, y: -50).concatenating(CGAffineTransform(rotationAngle: .pi / 2)) : .identity
+            box.lid.transform = self.isOpen ? CGAffineTransform(translationX: 0, y: -50)
+                .concatenating(CGAffineTransform(rotationAngle: .pi / 2)) : .identity
         })
-    }
+    } // Eğer isOpen true ise, box.lid'i yukarı doğru kaydırır ve 90 derece döndürür. Eğer false ise, dönüşüm sıfırlanır. Bu animasyon, 0.8 saniye süren bir geçişle uygulanır.
 }
 
 class Box: UIView {
@@ -248,15 +259,15 @@ class Box: UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
+    } // NSCoder sınıfı, bir nesneyi veri olarak kodlamak ve decode etmek için kullanılır.
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        lid.frame = CGRect(x: 0, y: 0, width: bounds.width , height: 100)
+        lid.frame = CGRect(x: 0, y: 0, width: bounds.width , height: 100) // lid bileşeninin CGRect içinde tanımlanan konum ve boyutlarını belirtir
         
-    }
+    } // layoutSubviews, view'ın boyutları değiştiğinde veya alt bileşenlerin konumları güncellenmesi gerektiğinde çağrılır. Bu metodun override edilmesi, alt bileşenlerin uygun şekilde yeniden düzenlenmesini sağlar.
 }
 
 #Preview {
-    BraceletDetailView(bracelet: Bracelet(word: "AHMETAHE", braceletColor: Color.green, angle: -12))
+    BraceletDetailView(bracelet: Bracelet(word: "AHMET", braceletColor: Color.green, angle: -12))
 }
